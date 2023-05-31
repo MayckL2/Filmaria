@@ -1,41 +1,63 @@
-import * as React from 'react';
-import { Text, View, StyleSheet, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
 
+import api from './src/service/api';
 import Filmes from './src/Filmes';
-import Api from './src/Services/api';
-import { ActivityIndicator } from 'react-native-paper';
 
-export default function App() {
-  const [filmes, setFilmes] = React.useState([])
-  const [loading, setLoading] = React.useState(true)
+function App() {
 
-  React.useEffect(() => {
+  const [filmes, setFilmes] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
     async function loadFilmes() {
-      const response = await Api.get('r-api/?api=filmes')
-
-      setFilmes(response.data)
-      setLoading(false)
+      const response = await api.get('r-api/?api=filmes');
+      // console.log(response.data);
+      setFilmes(response.data);
+      setLoading(false);
     }
 
-    loadFilmes()
-  }, [])
+    loadFilmes();
 
-  if (loading) {
-    return (
-      <View>
-        <ActivityIndicator color='black' size={45} />
+  }, []);
+
+  if(loading) {
+    return(
+      <View style={styles.loading}>
+        <ActivityIndicator color='#121212' size={45} />
       </View>
     )
   } else {
-    return (
-      <View>
+    return(
+      <View style={styles.container}>
         <FlatList 
-        data={filmes}
-        keyExtractor={item => String(item.id)}
-        renderItem={({item})=> <Filmes nome={item}/>}  
+          data={filmes}
+          keyExtractor={ item => String(item.id) }
+          renderItem={ ({ item }) => <Filmes data={ item } /> }
         />
       </View>
-    )
-  }
-    
+    );
+  } 
 }
+
+export default App;
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  
+  loading: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  act: {
+    size: 'large',
+    color: '#0000ff',
+  },
+
+});
